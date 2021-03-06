@@ -28,3 +28,46 @@ class DBMS:
             self.conn.close()
 
         return rows
+
+    def insert(self, table, data):
+        try:
+            self.connect()
+            # 1. combile keys
+            columns = ','.join(data.keys())
+            placeholders = ','.join(['%s '] * len(data))
+
+            sql = f'insert into {table}({columns}) values({placeholders});'
+            # print(sql)
+            self.cur.execute(sql, list(data.values()))
+            self.conn.commit()
+            
+
+        finally:
+            self.conn.close()
+
+        
+    def upsert(self, table, data):
+        try:
+            self.connect()
+            # 1. combile keys
+            columns = ','.join(data.keys())
+            placeholders = ','.join(['%s '] * len(data))
+
+            upsert_list = []
+            for d in list(data.keys()):
+                upsert_list.append(f'{d}={str(data[d])}')
+
+            upsert = ','.join(upsert_list)
+
+            sql = f'insert into {table}({columns}) values({placeholders}) on duplicate key update ({upsert});'
+            print(sql)
+            self.cur.execute(sql, list(data.values()))
+            self.conn.commit()
+            
+
+        finally:
+            self.conn.close()
+
+
+        
+
