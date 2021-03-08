@@ -5,7 +5,7 @@ class DBMS:
         self.connect()
 
     def connect(self):
-        self.conn = pymysql.connect(host=DB_CONFIG['ip'], user=DB_CONFIG['user'], password=DB_CONFIG['password'], db=DB_CONFIG['database'], charset='utf8')
+        self.conn = pymysql.connect(host=DB_CONFIG['ip'], user=DB_CONFIG['user'], password=DB_CONFIG['password'], db=DB_CONFIG['database'], charset='utf8', cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
 
     def query(self, query):
@@ -24,6 +24,49 @@ class DBMS:
 
             rows = self.cur.fetchall()
 
+        finally:
+            self.conn.close()
+
+        return rows
+
+    def select_latest(self, table, code):
+        try:
+            self.connect()
+            sql = f'select * from \
+                (\
+                    select * \
+                        from {table} \
+                            where (code, datetime) in (\
+                                select code, max(datetime) as datetime\
+                                    from {table} where code={code}\
+                                ) order by datetime desc\
+                ) t\
+                group by t.code'
+            self.cur.execute(sql)
+
+            rows = self.cur.fetchall()
+        finally:
+            self.conn.close()
+
+        return rows
+
+    def select_latest_market(self, table, market):
+        try:
+            self.connect()
+            sql = f'select * from \
+                (\
+                    select * \
+                        from {table} \
+                            where (market, datetime) in (\
+                                select market, max(datetime) as datetime\
+                                    from {table} where market="{market}"\
+                                ) order by datetime desc\
+                ) t\
+                group by t.market'
+
+            self.cur.execute(sql)
+
+            rows = self.cur.fetchall()
         finally:
             self.conn.close()
 

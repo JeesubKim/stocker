@@ -8,11 +8,11 @@ tables = ['stock_history','stock_item','stock_market']
 def main():
     db = DBMS()
     print("Start here")
-    for table in tables:
-        print(db.select(table))
+    # for table in tables:
+    #     print(db.select(table))
 
 
-    # run_monitoring_items()
+    run_monitoring_items()
 
 
 if __name__ == "__main__":
