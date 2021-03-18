@@ -68,7 +68,7 @@ class StockHistory(threading.Thread):
                 
                 page_num += 1
                 
-                print(table[1][table[1].columns[len(table[1].columns)-1]][0])
+                # print(table[1][table[1].columns[len(table[1].columns)-1]][0])
                 # time.sleep(2)
                 if table[1][table[1].columns[len(table[1].columns)-1]][0] != '맨뒤' and page_num > 1:
                     # There's no more data
@@ -86,6 +86,15 @@ class StockHistory(threading.Thread):
                         data[col] = str(final_data.iloc[idx][COLUMNS[col_idx]])
                     data['name'] = stock_item_name
                     data['code'] = code
+                    
+                    if idx == len(final_data.index) - 1 :
+                        
+                        fluc = ((float(data['closingPrice']) /float(latest_item[0]['closingPrice'])) - 1) * 100
+                    else :
+                        fluc = ((float(data['closingPrice']) /float(final_data.iloc[idx+1]['closingPrice'])) - 1) * 100
+                        
+                    fluc = round(fluc, 2)
+                    data['fluctuation'] = fluc
                     self.db.insert(TABLE, data)
 
         

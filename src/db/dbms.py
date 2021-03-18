@@ -12,9 +12,12 @@ class DBMS:
         try:
             self.connect()
             self.cur.execute(query)
-            self.conn.commit()
+            rows = self.cur.fetchall()
         finally:
             self.conn.close()
+
+
+        return rows
 
     def select(self, table):
         try:
@@ -112,5 +115,14 @@ class DBMS:
             self.conn.close()
 
 
-        
-
+    def updateById(self, table, data, _id):
+        try:
+            # self.connect()
+            sql = f'update {table} set {data} where id={_id};'
+            
+            self.cur.execute(sql)
+            
+            
+        finally:
+            pass
+        #     self.conn.close()
